@@ -11,7 +11,38 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final AuthService _authService = AuthService();
+
+bool isLoading = false;
+
+void handleLogin() async {
+  if (_formKey.currentState!.validate()) {
+    setState(() {
+      isLoading = true; // 1. Mulai Loading
+    });
+    
+    // Panggil service otentikasi (pastikan sudah ada)
+    User? user = await _authService.signInWithEmailAndPassword(
+      _emailController.text,
+      _passwordController.text,
+    );
+    
+    if (!mounted) return; // Cek jika widget masih ada
+    
+    if (user == null) {
+      // Tampilkan error jika login gagal
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login gagal. Periksa kembali kredensial Anda.')),
+      );
+      
+      setState(() {
+        isLoading = false; // 2. Hentikan Loading
+      });
+    }
+    // Navigasi akan ditangani secara otomatis oleh AuthGate
+  }
+}
+
+final AuthService _authService = AuthService();
   final _formKey = GlobalKey<FormState>();
   // ... di dalam build method LoginPage
   bool _isPasswordVisible = false;
@@ -27,7 +58,8 @@ class _LoginPageState extends State<LoginPage> {
         title: const Text('LogiTrack - Login'),
         backgroundColor: Colors.blueAccent,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
+        child: Padding(
         padding: const EdgeInsets.all(24.0), // Memberi jarak di sekeliling
         child: Form(
           key: _formKey,
@@ -93,33 +125,35 @@ class _LoginPageState extends State<LoginPage> {
             
             // 4. Tambahkan Tombol Login
             // Bungkus dengan SizedBox agar bisa mengatur lebar tombol
-            SizedBox(
-              width: double.infinity, // Lebar tombol penuh
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300), // Durasi animasi
+              width: isLoading ? 50 : double.infinity, // Lebar berubah
               height: 50,
               child: ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    User? user = await _authService.signInWithEmailAndPassword(
-                      _emailController.text,
-                      _passwordController.text,
-                    );
-
-                    if (user != null) {
-                      
-                    } else {
-                      // Tampilkan pesan kesalahan jika login gagal
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Login gagal. Periksa email dan password Anda.')),
-                      );
-                    }
-                  }
-                },
-                child: const Text('Login'),
+                style: ElevatedButton.styleFrom(
+                  // Sesuaikan shape agar menjadi lingkaran saat loading
+                  shape: isLoading
+                      ? const CircleBorder()
+                      : RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                // Nonaktifkan tombol saat loading
+                onPressed: isLoading ? null : handleLogin, 
+                child: isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.white, 
+                          strokeWidth: 3,
+                        ),
+                      )
+                    : const Text(
+                        'Login',
+                        style: TextStyle(fontSize: 18),
+                      ),
               ),
             ),
             const SizedBox(height: 16), // Memberi jarak vertikal
             
-            // 5. Tambahkan Tombol Login
+            // 5. Tambahkan Tombol Register
             // Bungkus dengan SizedBox agar bisa mengatur lebar tombol
             SizedBox(
               width: double.infinity, // Lebar tombol penuh
@@ -138,6 +172,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),  
       ),
+    ),
     );
   }
 }
