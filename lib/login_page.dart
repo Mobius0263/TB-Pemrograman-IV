@@ -70,7 +70,7 @@ final AuthService _authService = AuthService();
     return Scaffold(
       // ... AppBar tetap sama
       appBar: AppBar(
-        title: const Text('LogiTrack - Login'),
+        title: const Text('SendSee - Login'),
         backgroundColor: Colors.blueAccent,
       ),
       body: SingleChildScrollView(

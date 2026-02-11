@@ -74,7 +74,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       // ... AppBar tetap sama
       appBar: AppBar(
-        title: const Text('LogiTrack - Register'),
+        title: const Text('SendSee - Register'),
         backgroundColor: Colors.blueAccent,
       ),
       body: Padding(

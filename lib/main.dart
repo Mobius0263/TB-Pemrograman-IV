@@ -32,7 +32,7 @@ Widget build(BuildContext context) {
   
   return MaterialApp(
     debugShowCheckedModeBanner: false,
-    title: 'LogiTrack App',
+    title: 'SendSee',
     // Terapkan ThemeData global
     theme: ThemeData(
       // Gunakan Material 3
